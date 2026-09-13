@@ -1,6 +1,7 @@
 /**
- * ตัวกลางเรียก backend ทุกที่ในแอปควรเรียกผ่านไฟล์นี้ ไม่ควร fetch ตรง ๆ กระจายในคอมโพเนนต์
- * เพื่อให้จุดจัดการ base URL, header และ error อยู่ที่เดียว
+ * Every backend call in the app should go through this file rather than
+ * calling fetch directly from components, so that base URL, headers and
+ * error handling all live in one place.
  */
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 

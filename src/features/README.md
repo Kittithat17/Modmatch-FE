@@ -1,20 +1,19 @@
 # features
 
-โฟลเดอร์นี้แบ่งโค้ดตาม domain ของธุรกิจ ไม่ใช่ตามชนิดไฟล์
-เป้าหมายคือแต่ละ feature จบในตัวเอง เวลาหลายคนทำงานพร้อมกันจะแก้ไฟล์ชนกันน้อยลง
+This folder splits code by business domain, not by file type. The goal is that each feature stands on its own, so people working in parallel rarely touch the same files.
 
-## โครงของหนึ่ง feature
+## Shape of one feature
 
 ```
 src/features/matching/
-├── components/      คอมโพเนนต์ที่ใช้เฉพาะ feature นี้
-├── hooks/           React hooks ของ feature นี้
-├── api.ts           ฟังก์ชันเรียก backend ของ feature นี้ (เรียกผ่าน src/lib/api-client)
-└── types.ts         type ของ feature นี้
+├── components/      components used only by this feature
+├── hooks/           React hooks belonging to this feature
+├── api.ts           backend calls for this feature (go through src/lib/api-client)
+└── types.ts         types for this feature
 ```
 
-## กติกา
+## Rules
 
-- feature ห้าม import จาก feature อื่นโดยตรง ถ้าต้องใช้ร่วมกันให้ย้ายขึ้นไป `src/components` `src/lib` หรือ `src/types`
-- `src/app` ทำหน้าที่แค่ routing ประกอบหน้า และดึงข้อมูลระดับ page ตรรกะจริงอยู่ใน feature
-- `src/components/ui` เก็บคอมโพเนนต์ที่ไม่มี business logic เช่น Button Input Card ใช้ซ้ำได้ทุกที่
+- A feature must not import directly from another feature. If two features need the same thing, lift it up into `src/components`, `src/lib` or `src/types`.
+- `src/app` only does routing, page composition and page-level data fetching. The real logic lives in a feature.
+- `src/components/ui` holds components with no business logic, such as Button, Input and Card. They are reusable anywhere.

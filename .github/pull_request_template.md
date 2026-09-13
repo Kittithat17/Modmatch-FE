@@ -1,20 +1,20 @@
-## ทำอะไร
+## What does this change?
 
-<!-- อธิบายสั้น ๆ ว่า PR นี้เปลี่ยนอะไร และทำไม -->
+<!-- Briefly: what changed, and why. -->
 
-## เกี่ยวกับ issue ไหน
+## Related issue
 
-<!-- เช่น Closes #12 ถ้าไม่มีลบบรรทัดนี้ได้ -->
+<!-- e.g. Closes #12. Delete this line if there is none. -->
 
-## เช็คก่อนขอรีวิว
+## Checklist before requesting review
 
-- [ ] รัน `npm run lint` ผ่าน
-- [ ] รัน `npm run typecheck` ผ่าน
-- [ ] รัน `npm run build` ผ่าน
-- [ ] ลองกดใช้งานจริงบนเครื่องตัวเองแล้ว
-- [ ] ไม่มี secret หรือ `.env.local` หลุดมาใน diff
-- [ ] ถ้าเพิ่ม env ตัวใหม่ ได้เติมใน `.env.example` แล้ว
+- [ ] `npm run lint` passes
+- [ ] `npm run typecheck` passes
+- [ ] `npm run build` passes
+- [ ] I actually clicked through this on my own machine
+- [ ] No secrets or `.env.local` leaked into the diff
+- [ ] If I added an env var, I added it to `.env.example` too
 
-## ภาพหน้าจอ
+## Screenshots
 
-<!-- ถ้าแก้ UI แปะภาพก่อน/หลัง -->
+<!-- If this touches UI, drop before/after images here. -->

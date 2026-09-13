@@ -1,28 +1,28 @@
-# วิธีทำงานร่วมกันบน ModMatch FE
+# Contributing to ModMatch FE
 
-เขียนให้คนในทีมที่เพิ่งเข้ามาช่วยเขียนโค้ด อ่านจบแล้วควร push งานแรกได้เลย
+Written for anyone joining the team. Read this once and you should be able to ship your first change.
 
-## เริ่มต้นบนเครื่องตัวเอง
+## Local setup
 
 ```bash
 git clone https://github.com/Kittithat17/Modmatch-FE.git
 cd Modmatch-FE
-nvm use          # ใช้ Node ตาม .nvmrc คือเวอร์ชัน 20
-npm ci           # ใช้ ci ไม่ใช่ install จะได้เวอร์ชันตรงกับ package-lock ทุกคน
+nvm use          # uses Node 20 from .nvmrc
+npm ci           # not `npm install` — `ci` installs exactly what package-lock says
 cp .env.example .env.local
 npm run dev
 ```
 
-## branch ใช้ยังไง
+## Branches
 
-มี branch ถาวรสองอัน ห้าม push ตรงเข้าสองอันนี้ ต้องผ่าน PR เท่านั้น
+There are two permanent branches. Never push to either one directly. Everything goes through a pull request.
 
-| branch | คืออะไร | ใครเอาเข้า |
+| Branch | What it is | What merges into it |
 | --- | --- | --- |
-| `main` | โค้ดที่ขึ้น production ต้องใช้งานได้เสมอ | merge จาก `dev` เท่านั้น |
-| `dev` | ที่รวมงานของทุกคน เป็นค่าเริ่มต้นที่แตก branch ออกไป | merge จาก feature branch |
+| `main` | Production. Must always work. | `dev` only |
+| `dev` | Where everyone's work comes together. Branch off this one. | feature branches |
 
-เวลาจะทำงานใหม่ แตก branch จาก `dev` เสมอ
+Always branch off `dev`:
 
 ```bash
 git checkout dev
@@ -30,25 +30,25 @@ git pull
 git checkout -b feat/matching-filter
 ```
 
-ตั้งชื่อ branch ตามนี้ `feat/` ของใหม่ `fix/` แก้บั๊ก `chore/` งานจิปาถะเช่นอัปเดต dependency `refactor/` ย้ายโค้ดโดยพฤติกรรมเหมือนเดิม
+Name branches with a prefix: `feat/` for new work, `fix/` for bugs, `chore/` for maintenance such as dependency bumps, `refactor/` for moving code without changing behaviour.
 
-## เส้นทางของโค้ดหนึ่งชิ้น
+## How a change travels
 
 ```
 feat/xxx  ──PR──▶  dev  ──PR──▶  main
    ▲                ▲              ▲
    │                │              │
-CI รันทุก push   CI รันซ้ำ      CI รันซ้ำ
+CI on every push  CI again      CI again
 ```
 
-1. เขียนโค้ดบน feature branch แล้ว push CI จะรันให้ทันทีทุกครั้งที่ push
-2. เปิด PR เข้า `dev` รอ CI เขียว แล้วรออย่างน้อยหนึ่งคนอนุมัติ
-3. merge เข้า `dev` แล้วลอง `dev` ให้แน่ใจว่าไม่พัง
-4. พอพร้อมปล่อยจริง เปิด PR จาก `dev` เข้า `main`
+1. Write code on your feature branch and push. CI runs on every push, every time.
+2. Open a PR into `dev`. Wait for CI to go green and for at least one approval.
+3. Merge into `dev`, then check that `dev` still works.
+4. When you are ready to release, open a PR from `dev` into `main`.
 
-## ก่อน push ทุกครั้ง
+## Before every push
 
-รันสามคำสั่งนี้ให้ผ่านก่อน จะได้ไม่เสียเวลารอ CI แดงแล้วมาแก้
+Run these three locally so you do not wait on a red CI run to find out:
 
 ```bash
 npm run lint
@@ -56,24 +56,24 @@ npm run typecheck
 npm run build
 ```
 
-`npm run lint:fix` ช่วยแก้ที่แก้อัตโนมัติได้ให้
+`npm run lint:fix` fixes whatever is auto-fixable.
 
-## โค้ดไปวางตรงไหน
+## Where code goes
 
-| จะเพิ่มอะไร | วางที่ |
+| Adding | Put it in |
 | --- | --- |
-| หน้าใหม่ | `src/app/<route>/page.tsx` ให้ไฟล์นี้บางที่สุด ตรรกะจริงไปอยู่ใน feature |
-| ตรรกะของ domain หนึ่ง เช่น การจับคู่ | `src/features/<feature>/` อ่านกติกาใน `src/features/README.md` |
-| ปุ่ม input card ที่ใช้ซ้ำได้ทุกที่ | `src/components/ui/` ห้ามมี business logic |
-| navbar footer sidebar | `src/components/layout/` |
-| ฟังก์ชันเรียก backend | ผ่าน `src/lib/api-client.ts` เท่านั้น อย่า fetch ตรงในคอมโพเนนต์ |
-| hook ที่หลาย feature ใช้ | `src/hooks/` ถ้าใช้ feature เดียวเก็บไว้ใน feature นั้น |
-| type ที่หลาย feature ใช้ | `src/types/` |
+| A new page | `src/app/<route>/page.tsx`. Keep this file thin; real logic belongs in a feature. |
+| Logic for one domain, e.g. matching | `src/features/<feature>/`. See `src/features/README.md` for the rules. |
+| Buttons, inputs, cards reused anywhere | `src/components/ui/`. No business logic allowed. |
+| Navbar, footer, sidebar | `src/components/layout/` |
+| Anything that calls the backend | Go through `src/lib/api-client.ts`. Do not call `fetch` directly from components. |
+| A hook used by several features | `src/hooks/`. If only one feature uses it, keep it inside that feature. |
+| A type used by several features | `src/types/` |
 
-import ใช้ alias `@/` ได้เลย เช่น `import { apiFetch } from "@/lib/api-client"` ชี้ไปที่ `src/`
+Imports use the `@/` alias, which points at `src/`. For example `import { apiFetch } from "@/lib/api-client"`.
 
-## เรื่อง env
+## Environment variables
 
-ตัวแปรที่ขึ้นต้นด้วย `NEXT_PUBLIC_` จะถูกฝังลงใน bundle ฝั่ง browser ใครเปิด devtools ก็เห็น
-ห้ามใส่ API key หรืออะไรที่เป็นความลับในตัวแปรกลุ่มนี้
-เพิ่ม env ตัวใหม่เมื่อไหร่ ให้เติมชื่อมันใน `.env.example` ด้วยทุกครั้ง คนอื่นจะได้รู้ว่าต้องตั้งค่าอะไรบ้าง
+Anything prefixed with `NEXT_PUBLIC_` is inlined into the browser bundle. Anyone who opens devtools can read it. Never put an API key or any secret behind a `NEXT_PUBLIC_` name.
+
+Whenever you add a new environment variable, add its name to `.env.example` in the same PR so everyone else knows what they need to set.

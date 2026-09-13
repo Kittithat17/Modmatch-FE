@@ -1,15 +1,15 @@
 name: CI
 
-# ยิงทุก push ทุก branch ใครก็ตามที่ push โค้ดขึ้นมาจะโดนรัน pipeline เสมอ
-# และยิงอีกรอบตอนเปิด PR เข้า main หรือ dev เพราะ pull_request รันบนผลลัพธ์หลัง merge
-# ซึ่งต่างจาก push ที่รันบนหัว branch เฉย ๆ
+# Runs on every push to every branch, so nobody's code lands unchecked.
+# Runs again on PRs into main and dev, because pull_request builds the
+# merge result while push only builds the branch head.
 on:
   push:
     branches: ["**"]
   pull_request:
     branches: [main, dev]
 
-# push ซ้ำใส่ branch เดิม ให้ยกเลิกรอบเก่าที่ยังค้างอยู่ ประหยัด runner
+# Pushing again to the same branch cancels the run still in flight.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -46,9 +46,9 @@ jobs:
 
       - run: npm ci
 
-      # next typegen ต้องรันก่อน tsc เสมอ
-      # Next 16 สร้าง type ของ route เช่น LayoutProps<"/"> ตอน dev หรือ build
-      # ถ้าไม่ generate ก่อน tsc --noEmit จะเช็ค type ของ route ไม่ครบ
+      # `next typegen` must run before tsc. Next 16 emits route types such as
+      # LayoutProps<"/"> during dev, build or typegen only, so a bare
+      # `tsc --noEmit` would not type-check route usage at all.
       - run: npm run typecheck
 
   build:
@@ -74,8 +74,9 @@ jobs:
 
       - run: npm run build
 
-  # job สรุปผล ใช้ตัวนี้ตัวเดียวเป็น required status check ใน branch protection
-  # เวลาเพิ่ม job ใหม่ ไม่ต้องไปแก้ setting บน GitHub แค่เติมใน needs
+  # Single summary job. Make this the only required status check in branch
+  # protection: adding a job later means editing `needs` here rather than
+  # changing repository settings.
   ci-ok:
     name: CI OK
     runs-on: ubuntu-latest
@@ -85,7 +86,7 @@ jobs:
       - name: Check results
         run: |
           if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
-            echo "มี job ที่ไม่ผ่าน"
+            echo "At least one job did not pass"
             exit 1
           fi
-          echo "ผ่านครบทุก job"
+          echo "All jobs passed"

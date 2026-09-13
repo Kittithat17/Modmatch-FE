@@ -1,25 +1,23 @@
-# ตั้ง branch protection (เจ้าของ repo ทำครั้งเดียว)
+# Branch protection setup (repo owner, one time)
 
-ไฟล์ workflow บังคับให้ CI รันได้ แต่บังคับให้ "ต้องผ่าน CI ก่อน merge" ไม่ได้
-ส่วนนั้นเป็น setting บน GitHub ต้องไปกดเอง ทำตามนี้
+The workflow file makes CI *run*. It cannot make CI *required* before a merge. That part is a GitHub setting you have to click through yourself.
 
-## ก่อนอื่น push branch ขึ้นไปก่อน
+## First, push the branches
 
-GitHub จะตั้ง rule ให้ branch ที่ยังไม่มีอยู่จริงไม่ได้
+GitHub cannot create a rule for a branch that does not exist yet.
 
 ```bash
 git push origin main
 git push -u origin dev
 ```
 
-แล้วไปที่ Settings ▸ Branches ▸ Add branch ruleset
+Then go to Settings ▸ Branches ▸ Add branch ruleset.
 
-## ruleset สำหรับ `main`
+## Ruleset for `main`
 
-Target branches ใส่ `main`
-Enforcement status เลือก Active
+Set target branches to `main` and enforcement status to Active.
 
-ติ๊กตามนี้
+Enable:
 
 - Restrict deletions
 - Block force pushes
@@ -28,26 +26,22 @@ Enforcement status เลือก Active
   - Dismiss stale pull request approvals when new commits are pushed
 - Require status checks to pass
   - Require branches to be up to date before merging
-  - ค้นหาแล้วเลือก check ชื่อ **CI OK**
+  - Search for and select the check named **CI OK**
 
-เลือกแค่ `CI OK` พอ ไม่ต้องเลือก Lint Typecheck Build ทีละอัน
-เพราะ job `ci-ok` ใน `ci.yml` รอผลของทั้งสามอันแล้วสรุปให้
-เวลาเพิ่ม job ใหม่ในอนาคต แค่เติมชื่อใน `needs` ของ `ci-ok` ไม่ต้องกลับมาแก้ setting ตรงนี้
+Select only `CI OK`. Do not add Lint, Typecheck and Build individually. The `ci-ok` job in `ci.yml` already waits on all three and reports a single result. When you add a new job later, just add it to that job's `needs` list; you never have to come back and change this setting.
 
-> ถ้าหา `CI OK` ไม่เจอในช่องค้นหา แปลว่า workflow ยังไม่เคยรันสักครั้ง
-> ให้ push อะไรสักอย่างขึ้นไปก่อน แล้วค่อยกลับมาตั้ง
+> If `CI OK` does not show up in the search box, the workflow has never run. Push something first, then come back and set the rule.
 
-## ruleset สำหรับ `dev`
+## Ruleset for `dev`
 
-ทำเหมือน `main` ได้เลย แต่ถ้าทีมยังเล็กและอยากให้คล่องกว่า ลดเหลือแค่นี้ก็พอ
+Same as `main` works fine. If the team is small and you want to move faster, this is enough:
 
 - Block force pushes
-- Require a pull request before merging (Required approvals: 0 หรือ 1 แล้วแต่ทีม)
+- Require a pull request before merging (0 or 1 required approvals, your call)
 - Require status checks to pass ▸ **CI OK**
 
-## ตั้ง default branch เป็น `dev`
+## Make `dev` the default branch
 
-Settings ▸ General ▸ Default branch ▸ เปลี่ยนเป็น `dev`
+Settings ▸ General ▸ Default branch ▸ change it to `dev`.
 
-ทำแบบนี้เวลาเพื่อนกด clone หรือกดเปิด PR บนเว็บ ปลายทางจะเป็น `dev` โดยอัตโนมัติ
-ลดโอกาสเปิด PR ยิงเข้า `main` โดยไม่ตั้งใจ
+With that set, cloning and opening a PR on the web both target `dev` automatically, which makes it much harder to open a PR against `main` by accident.

@@ -1,11 +1,11 @@
-# ใครต้องถูกขอรีวิวอัตโนมัติเมื่อไฟล์ในพาธนั้นถูกแก้
-# เปิดใช้โดยลบ # หน้าบรรทัด แล้วเปลี่ยนเป็น GitHub username จริงของทีม
-# ถ้าใส่ username ผิด GitHub จะเงียบ ไม่ assign ให้ใครเลย
+# Who gets automatically requested for review when a path changes.
+# To enable, uncomment a line and replace the handle with a real GitHub username.
+# A username that does not exist fails silently: GitHub assigns nobody.
 
-# เจ้าของ repo ดูแลทุกไฟล์เป็นค่าเริ่มต้น
+# Repo owner covers everything by default
 # *                    @Kittithat17
 
-# ไฟล์ที่พังแล้วกระทบทุกคน ควรมีคนดูเป็นพิเศษ
+# Files that break everyone when they break, so worth a dedicated reviewer
 # /.github/            @Kittithat17
 # /next.config.ts      @Kittithat17
 # /package.json        @Kittithat17
