@@ -1,6 +1,6 @@
 # Branch protection setup (repo owner, one time)
 
-The workflow file makes CI *run*. It cannot make CI *required* before a merge. That part is a GitHub setting you have to click through yourself.
+The workflow file makes CI *run*. It cannot make CI *required* before a merge, and it cannot force a review. Those are GitHub settings you have to click through yourself.
 
 ## First, push the branches
 
@@ -23,12 +23,25 @@ Enable:
 - Block force pushes
 - Require a pull request before merging
   - Required approvals: 1
+  - Require approval of the most recent reviewable push
   - Dismiss stale pull request approvals when new commits are pushed
 - Require status checks to pass
   - Require branches to be up to date before merging
   - Search for and select the check named **CI OK**
 
-Select only `CI OK`. Do not add Lint, Typecheck and Build individually. The `ci-ok` job in `ci.yml` already waits on all three and reports a single result. When you add a new job later, just add it to that job's `needs` list; you never have to come back and change this setting.
+### Why those review options
+
+GitHub does not let the author of a pull request approve it, so "Required approvals: 1" on its own already means somebody else has to review before anything can merge. Nobody can wave their own work through.
+
+"Require approval of the most recent reviewable push" closes the gap where an author gets an approval on clean code and then pushes more commits behind it. Without this, the stale approval still counts and unreviewed code reaches `main`.
+
+### Leave the bypass list empty
+
+The bypass list at the top of the ruleset page is the setting people get wrong. Adding Repository admin there turns every rule below into a suggestion for admins, who can then merge straight past required reviews and a red CI run. Add nobody.
+
+### Only pick `CI OK`
+
+Do not add Lint, Typecheck and Build individually. The `ci-ok` job in `ci.yml` already waits on all three and reports a single result. When you add a new job later, add it to that job's `needs` list; you never have to come back and change this setting.
 
 > If `CI OK` does not show up in the search box, the workflow has never run. Push something first, then come back and set the rule.
 
@@ -40,8 +53,14 @@ Same as `main` works fine. If the team is small and you want to move faster, thi
 - Require a pull request before merging (0 or 1 required approvals, your call)
 - Require status checks to pass ▸ **CI OK**
 
-## Make `dev` the default branch
+## Default branch stays `main`
 
-Settings ▸ General ▸ Default branch ▸ change it to `dev`.
+No change needed in Settings ▸ General. It also means Vercel picks `main` as the production branch on its own when you connect the repo, which is what you want.
 
-With that set, cloning and opening a PR on the web both target `dev` automatically, which makes it much harder to open a PR against `main` by accident.
+The tradeoff: opening a pull request on the web defaults to `main`, so a feature branch can get pointed at production by accident. The ruleset above blocks the merge, but change the base to `dev` when you notice it.
+
+## Requiring a specific reviewer
+
+If you want every pull request to need *your* approval specifically rather than any teammate's, uncomment the owner line in `.github/CODEOWNERS` and add "Require review from Code Owners" to the `main` ruleset.
+
+Think twice on a small team. It makes you a bottleneck: everyone waits on one person instead of reviewing each other's work.

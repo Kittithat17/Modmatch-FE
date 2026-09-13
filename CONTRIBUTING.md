@@ -7,6 +7,7 @@ Written for anyone joining the team. Read this once and you should be able to sh
 ```bash
 git clone https://github.com/Kittithat17/Modmatch-FE.git
 cd Modmatch-FE
+git checkout dev # clone lands you on main, which is production. Work happens on dev.
 nvm use          # uses Node 20 from .nvmrc
 npm ci           # not `npm install` — `ci` installs exactly what package-lock says
 cp .env.example .env.local
