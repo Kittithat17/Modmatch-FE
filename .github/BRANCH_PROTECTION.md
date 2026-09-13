@@ -11,13 +11,20 @@ git push origin main
 git push -u origin dev
 ```
 
-Then go to Settings ▸ Branches ▸ Add branch ruleset.
+## Protect `main` and `dev` with one ruleset
 
-## Ruleset for `main`
+Both branches need the same protection. `dev` matters more day to day: every pull request the team opens goes there, while `main` only sees a pull request at release time. Protecting `main` alone guards the door nobody walks through.
 
-Set target branches to `main` and enforcement status to Active.
+One ruleset can cover both, so there is only one place to edit when the rules change.
 
-Enable:
+Go to Settings ▸ Branches ▸ Add branch ruleset.
+
+1. Name it something like `protected-branches`.
+2. Set enforcement status to Active.
+3. Under Target branches, select **Add a target** twice: once for `main`, once for `dev`.
+4. Enable the rules below.
+
+### Rules to enable
 
 - Restrict deletions
 - Block force pushes
@@ -33,7 +40,7 @@ Enable:
 
 GitHub does not let the author of a pull request approve it, so "Required approvals: 1" on its own already means somebody else has to review before anything can merge. Nobody can wave their own work through.
 
-"Require approval of the most recent reviewable push" closes the gap where an author gets an approval on clean code and then pushes more commits behind it. Without this, the stale approval still counts and unreviewed code reaches `main`.
+"Require approval of the most recent reviewable push" closes the gap where an author gets an approval on clean code and then pushes more commits behind it. Without this, the stale approval still counts and unreviewed code lands.
 
 ### Leave the bypass list empty
 
@@ -45,14 +52,6 @@ Do not add Lint, Typecheck and Build individually. The `ci-ok` job in `ci.yml` a
 
 > If `CI OK` does not show up in the search box, the workflow has never run. Push something first, then come back and set the rule.
 
-## Ruleset for `dev`
-
-Same as `main` works fine. If the team is small and you want to move faster, this is enough:
-
-- Block force pushes
-- Require a pull request before merging (0 or 1 required approvals, your call)
-- Require status checks to pass ▸ **CI OK**
-
 ## Default branch stays `main`
 
 No change needed in Settings ▸ General. It also means Vercel picks `main` as the production branch on its own when you connect the repo, which is what you want.
@@ -61,6 +60,6 @@ The tradeoff: opening a pull request on the web defaults to `main`, so a feature
 
 ## Requiring a specific reviewer
 
-If you want every pull request to need *your* approval specifically rather than any teammate's, uncomment the owner line in `.github/CODEOWNERS` and add "Require review from Code Owners" to the `main` ruleset.
+If you want every pull request to need *your* approval specifically rather than any teammate's, uncomment the owner line in `.github/CODEOWNERS` and add "Require review from Code Owners" to the ruleset.
 
 Think twice on a small team. It makes you a bottleneck: everyone waits on one person instead of reviewing each other's work.
