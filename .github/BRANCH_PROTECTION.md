@@ -2,6 +2,20 @@
 
 The workflow file makes CI *run*. It cannot make CI *required* before a merge, and it cannot force a review. Those are GitHub settings you have to click through yourself.
 
+## The repository has to be public
+
+Rulesets are only enforced on public repositories, or on private ones under a GitHub Team or Enterprise plan. On a private repository owned by a personal account, GitHub still lets you save a ruleset and shows a warning that it will not be enforced. Every rule below is silently ignored: anyone can push straight to `main` and merge their own work.
+
+So keep this repository public, or the whole setup below is decoration.
+
+Before flipping a repository to public, check that no credential ever reached the history, because making it public exposes every past commit, not just the current files:
+
+```bash
+git log --all --pretty=format: --name-only --diff-filter=A | sort -u
+```
+
+Read that list and confirm no `.env`, `.pem`, key or credential file was ever added. If one was, deleting it in a new commit is not enough; it stays in the history and has to be scrubbed or the secret rotated.
+
 ## First, push the branches
 
 GitHub cannot create a rule for a branch that does not exist yet.
